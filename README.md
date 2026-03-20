@@ -78,6 +78,31 @@ PROVIDER=mailgun MAILGUN_API_KEY=your-key MAILGUN_DOMAIN=yourdomain.com node ind
 |----------|----------|-------------|
 | `RESEND_API_KEY` | ✅ | Resend API key |
 
+## Switching Providers
+
+Just change the `PROVIDER` env var and set the matching API key. No code changes needed.
+
+**Mailgun → SendGrid:**
+```bash
+# Remove Mailgun vars, add SendGrid
+PROVIDER=sendgrid
+SENDGRID_API_KEY=SG.xxxxx
+```
+
+**Mailgun → Postmark:**
+```bash
+PROVIDER=postmark
+POSTMARK_API_KEY=xxxxx
+```
+
+**Mailgun → Resend:**
+```bash
+PROVIDER=resend
+RESEND_API_KEY=re_xxxxx
+```
+
+On Railway, update the env vars on the smtp-bridge service and it'll auto-redeploy. Your app's SMTP config stays the same — it doesn't know or care which provider is behind the bridge.
+
 ## Example: Ghost on Railway
 
 Set these on your **Ghost** service:
