@@ -1,14 +1,15 @@
 {
-  "name": "ghost-mail-bridge",
+  "name": "smtp-bridge",
   "version": "1.0.0",
-  "description": "SMTP to Mailgun HTTP API bridge for Railway",
+  "description": "SMTP relay that forwards emails via HTTP API (Mailgun, SendGrid, Postmark, Resend)",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
+  "keywords": ["smtp", "relay", "mailgun", "sendgrid", "postmark", "resend", "railway", "ghost"],
+  "license": "MIT",
   "dependencies": {
     "smtp-server": "^3.13.0",
-    "mailparser": "^3.7.0",
-    "form-data": "^4.0.0"
+    "mailparser": "^3.7.0"
   }
 }
