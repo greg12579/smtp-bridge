@@ -22,7 +22,7 @@ The bridge accepts SMTP connections on your internal network and forwards emails
 
 ### Railway
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/smtp-bridge)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template?template=https%3A%2F%2Fgithub.com%2Fgreg12579%2Fsmtp-bridge)
 
 ### Docker
 
