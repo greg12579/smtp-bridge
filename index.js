@@ -13,20 +13,24 @@ if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN) {
 }
 
 async function sendViaMailgun(from, to, subject, html, text) {
-  const form = new FormData();
-  form.append('from', from);
-  to.forEach(addr => form.append('to', addr));
-  form.append('subject', subject || '(no subject)');
-  if (html) form.append('html', html);
-  if (text) form.append('text', text);
-
   const url = `${MAILGUN_BASE_URL}/${MAILGUN_DOMAIN}/messages`;
   const auth = Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64');
 
+  // Use URLSearchParams instead of FormData for compatibility with Node fetch
+  const params = new URLSearchParams();
+  params.append('from', from);
+  to.forEach(addr => params.append('to', addr));
+  params.append('subject', subject || '(no subject)');
+  if (html) params.append('html', html);
+  if (text) params.append('text', text);
+
   const resp = await fetch(url, {
     method: 'POST',
-    headers: { 'Authorization': `Basic ${auth}` },
-    body: form
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: params.toString()
   });
 
   const body = await resp.text();
@@ -49,12 +53,21 @@ const server = new SMTPServer({
       }
 
       try {
-        const from = parsed.from?.text || `noreply@${MAILGUN_DOMAIN}`;
-        const to = parsed.to?.value?.map(a => a.address) || [];
+        // Get from address from parsed email or SMTP envelope
+        const fromAddr = parsed.from?.value?.[0]?.address;
+        const fromName = parsed.from?.value?.[0]?.name;
+        const from = fromAddr 
+          ? (fromName ? `${fromName} <${fromAddr}>` : fromAddr)
+          : (session.envelope?.mailFrom?.address || `noreply@${MAILGUN_DOMAIN}`);
+        
+        const to = parsed.to?.value?.map(a => a.address) 
+          || session.envelope?.rcptTo?.map(r => r.address) 
+          || [];
         const subject = parsed.subject;
         const html = parsed.html || undefined;
         const text = parsed.text || undefined;
 
+        console.log(`📨 Received: from=${from} to=${to.join(',')} subject=${subject}`);
         await sendViaMailgun(from, to, subject, html, text);
         callback();
       } catch (e) {
